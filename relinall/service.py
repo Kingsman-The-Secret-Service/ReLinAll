@@ -1,12 +1,12 @@
 from relinall.window import *
 
-class Remote(Window):
+class Service(Window):
 
     def __init__(self):
         super().__init__()
-        print("Remote")
+        print("Service")
 
-    def remote(self):
+    def service(self):
 
         self.serverDock()
-        self.featureTab('remote')
+        self.featureTab('service')
