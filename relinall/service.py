@@ -8,5 +8,5 @@ class Service(Window):
 
     def service(self):
 
-        self.serverDock()
-        self.featureTab('service')
+        self.docker()
+        self.tabber('service')

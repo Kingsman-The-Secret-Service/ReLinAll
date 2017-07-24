@@ -8,5 +8,11 @@ class Summary(Window):
 
 	def summary(self):
 
-		self.serverDock()
-		self.featureTab('summary')
+		self.docker()
+		self.tabber('summary')
+		
+        # tab.setLayout(QVBoxLayout())
+
+        # label = QLabel('time')
+        # label.setText(QDateTime.currentDateTime().toString())
+        # tab.layout().addWidget(label)

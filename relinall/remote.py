@@ -8,5 +8,5 @@ class Remote(Window):
 
     def remote(self):
 
-        self.serverDock()
-        self.featureTab('remote')
+        self.docker()
+        self.tabber('remote')
