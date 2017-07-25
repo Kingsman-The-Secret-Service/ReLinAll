@@ -13,4 +13,4 @@ class App(Server, Service, Summary, Putty, Scp):
 
 
 if __name__ == "__main__":
-	App()
+    App()
