@@ -8,8 +8,7 @@ class Putty(Window):
 
     def putty(self):
 
-        self.docker()
-        self.tabber('putty')
+        self.docker('putty')
 
     def port(self):
 
