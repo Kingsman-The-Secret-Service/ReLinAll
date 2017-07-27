@@ -169,3 +169,12 @@ class Window(object):
     def statusBar(self):
         self.statusbar = QStatusBar(self.MainWindow)
         self.MainWindow.setStatusBar(self.statusbar)
+
+    def serverInfo(self):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText("This is a message box")
+        msg.setInformativeText("This is additional information")
+        msg.setWindowTitle("MessageBox demo")
+        msg.setDetailedText("The details are as follows:")
+        msg.buttonClicked.connect(msg)
