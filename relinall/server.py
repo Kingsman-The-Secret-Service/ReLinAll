@@ -27,8 +27,7 @@ class Server(Window):
             
     def addServer(self):
         print("add server")
-        msg = QMessageBox()
-        msg.setText("This is a message box")
+
     
     def editServer(self):
         print("edit server")
