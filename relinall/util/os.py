@@ -1,0 +1,2 @@
+class Os(Object):
+	pass

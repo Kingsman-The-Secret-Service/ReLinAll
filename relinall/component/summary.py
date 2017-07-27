@@ -8,8 +8,15 @@ class Summary(Window):
 
 	def summary(self):
 
-		self.docker()
-		self.tabber('summary')
+		self.docker('summary')
+
+		tab = Helper.getData(self.widgetData[self.currentData()['hostname']], 'tab')
+		ssh = Helper.getData(self.widgetData[self.currentData()['hostname']], 'ssh')
+		print(tab, ssh)
+
+		cmd = "ls -la"
+
+		Ssh.execute(ssh, cmd)
 		
         # tab.setLayout(QVBoxLayout())
 

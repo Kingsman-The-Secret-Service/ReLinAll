@@ -8,5 +8,4 @@ class Scp(Window):
 
 	def scp(self):
 
-		self.docker()
-		self.tabber('scp')
+		self.docker('scp')

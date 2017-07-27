@@ -1,8 +1,9 @@
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from relinall.db import *
-from relinall.util import *
+from relinall.util.db import *
+from relinall.util.helper import *
+from relinall.util.ssh import *
 
 import sys, json
 
@@ -14,6 +15,7 @@ class Window(object):
     widgetData = {}
 
     def __init__(self):
+
         self.MainWindow = QMainWindow()
 
         # Main Window
@@ -100,42 +102,50 @@ class Window(object):
         
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
-    def docker(self):
+    def docker(self, tabName):
 
         currentData = self.currentData()
 
-        if currentData['hostname'] not in self.widgetData:
-            dockWidget = QDockWidget( currentData['hostname'] + ' (' + currentData['groupname'] +')')
-            dockWidget.setMinimumWidth(700)
-            dockWidget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-            
-            self.MainWindow.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
+        self.statusbar.showMessage("Connecting to " + currentData['hostname'])
+        ssh, error = Ssh.connect(currentData['hostname'], currentData['username'], currentData['password'])
 
-            if self.prevDockWidget:
-                self.MainWindow.tabifyDockWidget(self.prevDockWidget, dockWidget)
-            else:
-                self.prevDockWidget = dockWidget
-
-            tabWidget = QTabWidget(self.centralwidget)
-            tabWidget.setObjectName("tabWidget")
-            tabWidget.setTabsClosable(True)
-            tabWidget.tabCloseRequested.connect(self.tabberClose)
-
-            dockWidget.setWidget(tabWidget)
-
-            self.widgetData[currentData['hostname']] = {}
-            self.widgetData[currentData['hostname']]['dock'] = dockWidget
-            self.widgetData[currentData['hostname']]['tab'] = tabWidget
-            
+        if error:
+            self.statusbar.showMessage("Failed to connect " + currentData['hostname'])
         else:
-            dockWidget = self.widgetData[currentData['hostname']]['dock']
 
-        dockWidget.setVisible(True)
-        dockWidget.setFocus()
-        dockWidget.raise_()
-        dockWidget.show()
+            if currentData['hostname'] not in self.widgetData:
+                dockWidget = QDockWidget( currentData['hostname'] + ' (' + currentData['groupname'] +')')
+                dockWidget.setMinimumWidth(700)
+                dockWidget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+                
+                self.MainWindow.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
 
-        return dockWidget
+                if self.prevDockWidget:
+                    self.MainWindow.tabifyDockWidget(self.prevDockWidget, dockWidget)
+                else:
+                    self.prevDockWidget = dockWidget
+
+                tabWidget = QTabWidget(self.centralwidget)
+                tabWidget.setObjectName("tabWidget")
+                tabWidget.setTabsClosable(True)
+                tabWidget.tabCloseRequested.connect(self.tabberClose)
+
+                dockWidget.setWidget(tabWidget)
+
+                self.widgetData[currentData['hostname']] = {}
+                self.widgetData[currentData['hostname']]['dock'] = dockWidget
+                self.widgetData[currentData['hostname']]['tab'] = tabWidget
+                self.widgetData[currentData['hostname']]['ssh'] = ssh
+                self.statusbar.showMessage("Connected to " + currentData['hostname'])
+            else:
+                dockWidget = self.widgetData[currentData['hostname']]['dock']
+
+            dockWidget.setVisible(True)
+            dockWidget.setFocus()
+            dockWidget.raise_()
+            dockWidget.show()
+
+            self.tabber(tabName)
 
     def tabber(self, name):
 
@@ -164,7 +174,7 @@ class Window(object):
     def currentData(self):
         index = self.treeView.selectedIndexes()[0]
         crawler = index.model().itemFromIndex(index)
-        return Util.getData(crawler.data())
+        return Helper.getData(crawler.data())
 
     def statusBar(self):
         self.statusbar = QStatusBar(self.MainWindow)

@@ -8,5 +8,4 @@ class Service(Window):
 
     def service(self):
 
-        self.docker()
-        self.tabber('service')
+        self.docker('service')
