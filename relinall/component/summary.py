@@ -2,6 +2,8 @@ from relinall.window import *
 
 class Summary(Window):
 
+	summaryData = {}
+
 	def __init__(self):
 		super().__init__()
 		print("summary")
@@ -10,16 +12,83 @@ class Summary(Window):
 
 		self.docker('summary')
 
-		tab = Helper.getData(self.widgetData[self.currentData()['hostname']], 'tab')
+		summaryTab = Helper.getData(self.widgetData[self.currentData()['hostname']], 'summary')
 		ssh = Helper.getData(self.widgetData[self.currentData()['hostname']], 'ssh')
-		print(tab, ssh)
+		summaryTab.setLayout(QVBoxLayout())
 
-		cmd = "ls -la"
+		self.ip()
+		self.hostname(ssh)
+		self.uptime(ssh)
+		self.kernelname(ssh)
+		self.kernelrelease(ssh)
+		self.osname(ssh)
+		self.processor(ssh)
+		self.memory(ssh)
+		# self.ifconfig()
+		self.filesystem(ssh)
 
-		Ssh.execute(ssh, cmd)
+		html = self.render('summary.html', self.summaryData)
+
+		view = QWebEngineView()
+		view.setHtml(html,QUrl("file://"))
+		summaryTab.layout().addWidget(view)
+
+	def ip(self):
+		self.summaryData['ip'] = self.currentData()['hostname']
+
+	def hostname(self, ssh):
+		output = Ssh.execute(ssh, 'hostname')
+		self.summaryData['hostname'] = output.decode('utf-8')
+
+	def uptime(self, ssh):
+		output = Ssh.execute(ssh, 'uptime -p')
+		self.summaryData['uptime'] = output.decode('utf-8')
+
+	def kernelname(self, ssh):
+		output = Ssh.execute(ssh, 'uname -s')
+		self.summaryData['kernelname'] = output.decode('utf-8')
+	
+	def kernelrelease(self, ssh):
+		output = Ssh.execute(ssh, 'uname -r')
+		self.summaryData['kernelrelease'] = output.decode('utf-8')
+	
+	def osname(self, ssh):
+		output = Ssh.execute(ssh, 'uname -o')
+		self.summaryData['osname'] = output.decode('utf-8')
+	
+	def processor(self, ssh):
+		output = Ssh.execute(ssh, 'uname -p')
+		self.summaryData['processor'] = output.decode('utf-8')
+
+	def memory(self, ssh):
 		
-        # tab.setLayout(QVBoxLayout())
+		output = Ssh.execute(ssh, 'free -mw')
+		fieldnames = ['type', 'total', 'used', 'free', 'shared', 'buff', 'cache', 'available']
+		data = {d['type']:d for d in Helper.outputParser(output,fieldnames=fieldnames)}
 
-        # label = QLabel('time')
-        # label.setText(QDateTime.currentDateTime().toString())
-        # tab.layout().addWidget(label)
+		self.summaryData['chart'] = json.dumps([
+			{
+		        'name': 'Used',
+		        'data': [int(data['Mem:']['used']), int(data['Swap:']['used'])]
+		    }, {
+		        'name': 'Free',
+		        'data': [int(data['Mem:']['free']), int(data['Swap:']['free'])]
+		    }, {
+		        'name': 'Buffer',
+		        'data': [int(data['Mem:']['buff'])]
+		    }, {
+		        'name': 'Cache',
+		        'data': [int(data['Mem:']['cache'])]
+		    }
+        ])
+
+	def filesystem(self, ssh):
+		output = Ssh.execute(ssh, 'df -h')
+		fieldnames = ['filesystem', 'size', 'used', 'avail', 'use', 'mounted']
+		data = [ d for d in Helper.outputParser(output,fieldnames=fieldnames)]
+
+		self.summaryData['filesystem'] = data
+
+	def ifconfig(self, ssh):
+		output = Ssh.execute(ssh, 'ifconfig')
+		parsed = Helper.outputParser(output)

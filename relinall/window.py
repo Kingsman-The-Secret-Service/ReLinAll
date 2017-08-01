@@ -1,11 +1,13 @@
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtWebEngineWidgets import *
 from relinall.util.db import *
 from relinall.util.helper import *
 from relinall.util.ssh import *
+from jinja2 import *
 
-import sys, json
+import sys, os
 
 class Window(object):
 
@@ -22,18 +24,14 @@ class Window(object):
         self.MainWindow.resize(self.width, self.height)
         self.MainWindow.setWindowTitle("ReLinAll")
         self.MainWindow.setTabPosition(Qt.RightDockWidgetArea, QTabWidget.North)
+        # self.MainWindow.showMaximized()
 
         self.menuBar()
-        self.centralLayout()
         self.treeView()
         self.statusBar()
         
         QMetaObject.connectSlotsByName(self.MainWindow)
         self.MainWindow.show()
-
-    def centralLayout(self):
-        self.centralwidget = QWidget(self.MainWindow)
-        self.MainWindow.setCentralWidget(self.centralwidget)
 
     def menuBar(self):
         self.menubar = QMenuBar(self.MainWindow)
@@ -63,7 +61,9 @@ class Window(object):
         self.menubar.addAction(menuServer.menuAction())
 
     def treeView(self):
-        self.treeView = QTreeView(self.centralwidget)
+        dockWidget = QDockWidget()
+        dockWidget.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        self.treeView = QTreeView()
         self.treeView.setMaximumSize(QSize(200, 16777215))
         self.treeView.setGeometry(QRect(10, 10, 200, self.height))
         self.treeView.setObjectName("treeView")
@@ -74,6 +74,10 @@ class Window(object):
         self.treeView.setWordWrap(True)
         self.treeView.setContextMenuPolicy(Qt.CustomContextMenu)
         self.treeView.customContextMenuRequested.connect(self.treeContextMenu)
+
+        dockWidget.setWidget(self.treeView)
+
+        self.MainWindow.addDockWidget(Qt.LeftDockWidgetArea, dockWidget)
 
     def treeContextMenu(self, position):
     
@@ -115,8 +119,7 @@ class Window(object):
 
             if currentData['hostname'] not in self.widgetData:
                 dockWidget = QDockWidget( currentData['hostname'] + ' (' + currentData['groupname'] +')')
-                dockWidget.setMinimumWidth(700)
-                dockWidget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+                dockWidget.setAllowedAreas(Qt.RightDockWidgetArea)
                 
                 self.MainWindow.addDockWidget(Qt.RightDockWidgetArea, dockWidget)
 
@@ -125,7 +128,7 @@ class Window(object):
                 else:
                     self.prevDockWidget = dockWidget
 
-                tabWidget = QTabWidget(self.centralwidget)
+                tabWidget = QTabWidget()
                 tabWidget.setObjectName("tabWidget")
                 tabWidget.setTabsClosable(True)
                 tabWidget.tabCloseRequested.connect(self.tabberClose)
@@ -179,3 +182,17 @@ class Window(object):
     def statusBar(self):
         self.statusbar = QStatusBar(self.MainWindow)
         self.MainWindow.setStatusBar(self.statusbar)
+
+    def render(self, fileName, data):
+
+        currentDirectoryPath = os.path.dirname(os.path.realpath(__file__))
+        templatePath = currentDirectoryPath + '/templates/'
+        staticPath = 'file://' + currentDirectoryPath + '/static/'
+        
+        env = Environment(
+            loader = FileSystemLoader(templatePath)
+        )
+
+        template = env.get_template(fileName)
+        html = template.render(data, staticPath = staticPath)
+        return html

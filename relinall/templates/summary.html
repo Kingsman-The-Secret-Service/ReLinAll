@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %} Summary{% endblock %}
+
+{% block container %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-5">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Server Details</h3>
+        </div>
+          <table class="table table-hover table-striped table-bordered">
+            <tr><td>IP</td><td>{{ip}}</td></tr>
+            <tr><td>Hostname</td><td>{{hostname}}</td></tr>
+            <tr><td>OS Name</td><td>{{osname}}</td></tr>
+            <tr><td>Kernel Name</td><td>{{kernelname}}</td></tr>
+            <tr><td>Kernel Release</td><td>{{kernelrelease}}</td></tr>
+            <tr><td>Processor</td><td>{{processor}}</td></tr>
+            <tr><td>Uptime</td><td>{{uptime}}</td></tr>
+          </table>
+      </div>
+    </div>
+
+    <div class="col-md-7" >
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Server Memory Usage Chart</h3>
+        </div>
+        <div class="panel-body center-block" id="memoryChart" style="height: 250px;">
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="row">
+    <div class="col-md-12" >
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Sever File System</h3>
+        </div>
+        <table class="table table-hover table-striped table-bordered">
+          <!-- <th>
+            <td>File System</td>
+            <td>Size</td>
+            <td>Used</td>
+            <td>Available</td>
+            <td>Use</td>
+            <td>Mounted On</td>
+          </th> -->
+        {% for value in filesystem %}
+          <tr>
+            <td>{{value.filesystem}}</td>
+            <td>{{value.size}}</td>
+            <td>{{value.used}}</td>
+            <td>{{value.avail}}</td>
+            <td>{{value.use}}</td>
+            <td>{{value.mounted}}</td>
+          </tr>
+        {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ super() }}
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script type="text/javascript">
+  Highcharts.chart('memoryChart', {
+    chart: {
+        type: 'bar'
+    },
+    title: {
+        text: 'Server Memory (in MB)'
+    },
+    xAxis: {
+        categories: ['Memory', 'Swap']
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Total server memory consumption'
+        },
+        stackLabels: {
+            enabled: true,
+            style: {
+                fontWeight: 'bold',
+                color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+            }
+        }
+    },
+    plotOptions: {
+        series: {
+            stacking: 'normal',
+            dataLabels: {
+                enabled: true,
+                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+            }
+        }
+    },
+    tooltip: {
+        headerFormat: '<b>{point.x}</b><br/>',
+        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+    },
+    series: {{ chart }}
+});
+</script>
+{% endblock %}
+

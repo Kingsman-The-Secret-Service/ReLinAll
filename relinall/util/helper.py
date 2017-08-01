@@ -1,4 +1,5 @@
 import json
+import subprocess, csv
 
 class Helper(object):
 	
@@ -10,3 +11,15 @@ class Helper(object):
 		if key:
 			return data[key]
 		return data
+	
+	def executeCmd(cmd):
+		result = subprocess.run(cmd, stdout=subprocess.PIPE)
+		return result
+
+	def outputParser(output, delimiter=' ', skipinitialspace=True, fieldnames=[]):
+		reader = csv.DictReader(
+			output.decode('utf-8').splitlines()
+			, delimiter=delimiter
+            , skipinitialspace=skipinitialspace
+            , fieldnames=fieldnames)
+		return reader
