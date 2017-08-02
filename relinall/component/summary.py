@@ -6,11 +6,12 @@ class Summary(Window):
 
 	def __init__(self):
 		super().__init__()
-		print("summary")
 
 	def summary(self):
 
 		self.docker('summary')
+
+		# if 'summary' in self.widgetData[currentData['hostname']]:
 
 		summaryTab = Helper.getData(self.widgetData[self.currentData()['hostname']], 'summary')
 		ssh = Helper.getData(self.widgetData[self.currentData()['hostname']], 'ssh')
@@ -26,12 +27,13 @@ class Summary(Window):
 		self.memory(ssh)
 		# self.ifconfig()
 		self.filesystem(ssh)
+		self.release(ssh)
 
 		html = self.render('summary.html', self.summaryData)
-
 		view = QWebEngineView()
 		view.setHtml(html,QUrl("file://"))
 		summaryTab.layout().addWidget(view)
+
 
 	def ip(self):
 		self.summaryData['ip'] = self.currentData()['hostname']
@@ -92,3 +94,10 @@ class Summary(Window):
 	def ifconfig(self, ssh):
 		output = Ssh.execute(ssh, 'ifconfig')
 		parsed = Helper.outputParser(output)
+
+
+	def release(self, ssh):
+		output = Ssh.execute(ssh, 'cat /etc/*-release')
+		fieldnames = ['field', 'value']
+		data = { d['field'] : d['value'] for d in Helper.outputParser(output,delimiter='=',fieldnames=fieldnames)}
+		self.summaryData['release'] = data

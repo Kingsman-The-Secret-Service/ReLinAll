@@ -56,8 +56,7 @@ class Window(object):
     def serverMenu(self):
         menuServer = QMenu(self.menubar)
         menuServer.setTitle("Server")
-        menuServer.addAction("Add Server", self.addServer)
-        menuServer.addAction("Add Group", self.addServer)
+        menuServer.addAction("Add Server", self.addServer).setObjectName('MainMenuAddServer')
         self.menubar.addAction(menuServer.menuAction())
 
     def treeView(self):
@@ -93,16 +92,18 @@ class Window(object):
         
         menu = QMenu()
         if level == 0:
-            menu.addAction("Add Server", self.addServer)
+            menu.addAction("Add Server", self.addServer).setObjectName('ContextAddServer')
+            menu.addSeparator()
+            menu.addAction("Remove Group", self.removeGroup).setObjectName('ContextAddServer')
 
         elif level == 1:
+            menu.addAction("Summary", self.summary)
+            # menu.addAction("Putty", self.putty)
+            # menu.addAction("Services", self.service)
+            # menu.addAction("SCP", self.scp)
+            menu.addSeparator()
             menu.addAction("Edit Server", self.editServer)
             menu.addAction("Remove Server", self.removeServer)
-            menu.addSeparator()
-            menu.addAction("Summary", self.summary)
-            menu.addAction("Putty", self.putty)
-            menu.addAction("Services", self.service)
-            menu.addAction("SCP", self.scp)
         
         menu.exec_(self.treeView.viewport().mapToGlobal(position))
 
@@ -175,7 +176,11 @@ class Window(object):
         widgets.parentWidget().parentWidget().removeTab(i)
     
     def currentData(self):
-        index = self.treeView.selectedIndexes()[0]
+        try:
+            index = self.treeView.selectedIndexes()[0]
+        except Exception:
+            return {}
+
         crawler = index.model().itemFromIndex(index)
         return Helper.getData(crawler.data())
 

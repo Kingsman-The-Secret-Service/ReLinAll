@@ -1,7 +1,7 @@
 import sqlite3
 import os.path
 
-class db(object):
+class DB(object):
 
 	def __init__(self):
 
@@ -21,9 +21,9 @@ class db(object):
 		self.generateServerTable()
 
 	def generateServerTable(self):
-		self.cursor.executescript("CREATE TABLE server(groupname,hostname,username,password,os_type,port);")
+		self.cursor.executescript("CREATE TABLE server(groupname,hostname PRIMARY KEY,username,password,port);")
 		self.connection.commit()
-		self.cursor.close()
+		# self.cursor.close()
 
 	def dict_factory(self, cursor, row):
 	    d = {}
@@ -31,7 +31,7 @@ class db(object):
 	        d[col[0]] = row[idx]
 	    return d
 
-class server(db):
+class ServerModel(DB):
 
 	def __init__(self):
 		super().__init__()
@@ -51,3 +51,14 @@ class server(db):
 		self.cursor.execute("SELECT * FROM server where groupname = '" + groupName + "'")
 		return self.cursor.fetchall()
 
+	def insertServer(self, values):
+		self.connection.execute("REPLACE INTO server (groupname,hostname,username,password,port) VALUES ('" + values['groupname'] +"', '" + values['hostname'] +"', '" + values['username'] +"', '" + values['password'] +"', '" + values['port'] +"')");
+		self.connection.commit()
+
+	def deleteServer(self, hostname):
+		self.connection.execute("DELETE from server where hostname = '" + hostname + "';");
+		self.connection.commit()
+
+	def deleteGroup(self, groupname):
+		self.connection.execute("DELETE from server where groupname = '" + groupname + "';");
+		self.connection.commit()
