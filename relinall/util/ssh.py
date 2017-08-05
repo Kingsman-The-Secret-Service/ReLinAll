@@ -2,14 +2,14 @@ import paramiko
 
 class Ssh():
 
-	def connect(hostname, username, password):
+	def connect(hostname, username, password, port = 22):
 		
 		error = None
 
 		ssh = paramiko.SSHClient()
 		ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 		try:
-			ssh.connect(hostname, username=username, password=password, auth_timeout=5.0, timeout=5.0)
+			ssh.connect(hostname, username=username, password=password, port=port, auth_timeout=5.0, timeout=5.0)
 		except Exception:
 			error = True
 		# error = False

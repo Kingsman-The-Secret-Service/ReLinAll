@@ -112,7 +112,7 @@ class Window(object):
         currentData = self.currentData()
 
         self.statusbar.showMessage("Connecting to " + currentData['hostname'])
-        ssh, error = Ssh.connect(currentData['hostname'], currentData['username'], currentData['password'])
+        ssh, error = Ssh.connect(currentData['hostname'], currentData['username'], currentData['password'], currentData['port'])
 
         if error:
             self.statusbar.showMessage("Failed to connect " + currentData['hostname'])

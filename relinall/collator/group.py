@@ -8,7 +8,7 @@ class Group(object):
 	def removeGroup(self):
 
 		groupname = self.currentData()['groupname']
-		reply = QMessageBox.question(self.MainWindow, 'Message', "Deleting the group <b>" + groupname + "</b> delete all server from it, are you sure wanna do it?", QMessageBox.Yes, QMessageBox.Close)
+		reply = QMessageBox.question(self.MainWindow, 'Message', "Deleting the group <b>" + groupname + "</b> delete all server from it, are you sure wanna do it?", QMessageBox.Yes, QMessageBox.No)
 
 		if reply == QMessageBox.Yes:
 			self.serverModel.deleteGroup(groupname)

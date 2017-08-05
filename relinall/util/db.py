@@ -46,9 +46,8 @@ class ServerModel(DB):
 			serverGroupedData[group['groupname']]['count'] = group['count']
 		return serverGroupedData
 
-
-	def getSeverByGroup(self, groupName):
-		self.cursor.execute("SELECT * FROM server where groupname = '" + groupName + "'")
+	def getSeverByGroup(self, groupname):
+		self.cursor.execute("SELECT * FROM server where groupname = '" + groupname + "'")
 		return self.cursor.fetchall()
 
 	def insertServer(self, values):
