@@ -1,11 +1,11 @@
 from relinall.window import *
 
-class Scp(Window):
+class Ftp(Window):
 
 	def __init__(self):
 		super().__init__()
-		print("scp")
+		print("ftp")
 
-	def scp(self):
+	def ftp(self):
 
-		self.docker('scp')
+		self.docker('ftp')

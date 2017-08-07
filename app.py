@@ -1,9 +1,9 @@
 from relinall.component.summary import *
 from relinall.component.service import *
 from relinall.component.putty import *
-from relinall.component.scp import *
+from relinall.component.ftp import *
 
-class Component(Summary, Service, Putty, Scp):
+class Component(Summary, Service, Putty, Ftp):
 	def __init__(self):
 		super().__init__()
 

@@ -98,9 +98,10 @@ class Window(object):
 
         elif level == 1:
             menu.addAction("Summary", self.summary)
+            menu.addAction("Ftp", self.ftp)
             # menu.addAction("Putty", self.putty)
             # menu.addAction("Services", self.service)
-            # menu.addAction("SCP", self.scp)
+            
             menu.addSeparator()
             menu.addAction("Edit Server", self.editServer)
             menu.addAction("Remove Server", self.removeServer)
